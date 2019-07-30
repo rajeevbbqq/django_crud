@@ -1,0 +1,76 @@
+------ Virtual environment, Pip & Django installation -------
+
+1. python -m venv djangoenv - djangoenv, is the name for virual environment for interacting with pip (Pip, a command line interface for interacting with python packages), you can call whatever name you want.
+2. djangoenv\Scripts\activate - Activating Virtual environment
+3. Created a file called requirements.txt - Look into that file, we can define there whatever we want to install  
+4. pip install -r requirements.txt - Pip installs from file requirements.txt (-r symbol denotes pip to read from requirements.txt)
+
+------ After django installation, we can start creating projects -------
+
+5. django-admin.exe startproject crud . - The .(dot) is crucial, and you are free to rename crud to whatever you want.
+6. Then have a look into crud/settings.py and change ALLOWED_HOSTS = ['127.0.0.1'] & TIME_ZONE = 'Asia/Kolkata' . This is for running django server on localhost and based on our time zone while printing date.
+
+------ Database configuration -------
+
+7. Check section DATABASES on crud/settings.py and change ENGINE to your choice, i used 'postgres'.
+8. Run python manage.py migrate - This step is optional ! Which create tables on Database for running a django admin panel and this is optional
+
+------ Running django server -------
+
+9. python manage.py runserver - Runs server on http://127.0.0.1:8000/. To change port, run `python manage.py runserver 0.0.0.0:8080` to run on port http://127.0.0.1:8080/ 
+
+------ Now we need to create application under CRUD -------
+
+Here is what we are trying to accomplish.
+
+* Create a database table for cats with name, breed, gender and age.
+* Add cats into it.
+* Fetch cats by its name/age/gender.
+* Update cat by its id.
+* Remove cats from database table.
+
+10. python manage.py startapp cats - You are free to rename 'cats' to anything you would like.
+11. add 'cats' to dictionary INSTALLED_APPS on crud/settings.py - Please have a look into crud/settings.py
+12. Define cat class under cats/models.py - Please check this file cats/models.py, this is how we define table entities using model.
+13. python manage.py makemigration cats - Generates migrations for created cat model (If successfully run, it creates a file under cats/migrations/0001_initial.py) and check that file.
+14. python manage.py migrate cats - This command will create a table at our database
+
+------ Creating URL for cats -------
+
+15. Create a file called urls.py at cats/urls.py - Check that file
+
+------ Creating a record for cat -------
+
+16. defined a function as `createCat` on cats/views.py - Check that file
+17. @csrf_exempt used to disable csrf - Include from django.views.decorators.csrf import csrf_exempt as head. The decorator csrf_exempt is located at django.views.decorators.csrf
+18. Add this `from .models import Cat` to top on cats/views.py - By including this to view, we are able to access our Cat model.
+19. Add this `from django.http import JsonResponse` to top on cats/views.py - This is for json serialization
+
+That's it. Then pass required params to url http://127.0.0.1:8000/cats/create 
+Accepted body params are as below,
+
+name:kitty
+age:3
+breed:Indian
+gender:Male
+
+------ Fetching all records -------
+
+20. defined a function as `catsList` on cats/views.py - Check that file
+21. JsonResponse used to serialization
+22. `cats = Cat.objects.order_by('created_date').all()` - This will fetch all records from cats table
+
+That's it http://127.0.0.1:8000/cats/show
+
+------ Fetching cat by cat Id -------
+
+23. defined a function as `catById` on cats/views.py - Check that file
+24. `cat = Cat.objects.get(pk=cat_id)` - Used to fetch cat by it's id.
+
+Access this this on: http://127.0.0.1:8000/cats/30/show
+
+------ Removing cat by cat Id -------
+
+25. defined a function as `catRemoveById` on cats/views.py - Check that file
+
+Access this this on: http://127.0.0.1:8000/cats/30/remove
